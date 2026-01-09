@@ -35,7 +35,7 @@ export default function Dashboard() {
             </span>
             <button
               onClick={logout}
-              className="flex items-center space-x-2 rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300"
+              className="flex cursor-pointer items-center space-x-2 rounded-lg bg-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-300"
             >
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
@@ -45,54 +45,108 @@ export default function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-lg font-medium text-gray-900">Available Rooms</h2>
+        <div className="mb-6 flex items-center justify-end">
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
+            className="flex cursor-pointer items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
           >
             <Plus className="h-4 w-4" />
             <span>Create Room</span>
           </button>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {rooms.map((room) => (
-            <Link
-              key={room.id}
-              to={`/room/${room.id}`}
-              className="group block rounded-xl bg-white p-6 shadow transition hover:shadow-md"
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  {room.type === "private" ? (
-                    <Lock className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
-                  ) : (
-                    <Hash className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
-                  )}
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
-                    {room.name}
-                  </h3>
-                </div>
-                {room.type === "private" && (
-                  <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                    Private
-                  </span>
-                )}
+        <div className="mb-12">
+          <h2 className="mb-4 text-lg font-medium text-gray-900">Your Rooms</h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {rooms
+              .filter((room) => room.createdBy === user?.uid)
+              .map((room) => (
+                <Link
+                  key={room.id}
+                  to={`/room/${room.id}`}
+                  className="group block rounded-xl bg-white p-6 shadow transition hover:shadow-md"
+                >
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {room.type === "private" ? (
+                        <Lock className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
+                      ) : (
+                        <Hash className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
+                      )}
+                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
+                        {room.name}
+                      </h3>
+                    </div>
+                    {room.type === "private" && (
+                      <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                        Private
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500">Created by You</p>
+                </Link>
+              ))}
+            {rooms.filter((room) => room.createdBy === user?.uid).length ===
+              0 && (
+              <div className="col-span-full rounded-xl border-2 border-dashed border-gray-200 py-12 text-center">
+                <p className="text-gray-500">
+                  You haven't created any rooms yet.
+                </p>
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
+                >
+                  Create one now
+                </button>
               </div>
-              <p className="text-sm text-gray-500">
-                Created by{" "}
-                {room.createdBy === user?.uid ? "You" : room.creatorName}
-              </p>
-            </Link>
-          ))}
-          {rooms.length === 0 && (
-            <div className="col-span-full py-12 text-center">
-              <p className="text-gray-500">
-                No rooms available. Create one to get started!
-              </p>
-            </div>
-          )}
+            )}
+          </div>
+        </div>
+
+        <div>
+          <h2 className="mb-4 text-lg font-medium text-gray-900">
+            Available Rooms
+          </h2>
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {rooms
+              .filter((room) => room.createdBy !== user?.uid)
+              .map((room) => (
+                <Link
+                  key={room.id}
+                  to={`/room/${room.id}`}
+                  className="group block rounded-xl bg-white p-6 shadow transition hover:shadow-md"
+                >
+                  <div className="mb-2 flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      {room.type === "private" ? (
+                        <Lock className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
+                      ) : (
+                        <Hash className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
+                      )}
+                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
+                        {room.name}
+                      </h3>
+                    </div>
+                    {room.type === "private" && (
+                      <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                        Private
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500">
+                    Created by {room.creatorName}
+                  </p>
+                </Link>
+              ))}
+            {rooms.filter((room) => room.createdBy !== user?.uid).length ===
+              0 && (
+              <div className="col-span-full py-12 text-center">
+                <p className="text-gray-500">
+                  No other rooms available at the moment.
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </main>
 
