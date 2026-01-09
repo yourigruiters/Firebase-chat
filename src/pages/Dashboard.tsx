@@ -3,7 +3,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { db } from "../config/firebase";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { Link } from "react-router-dom";
-import { LogOut, Plus, Lock, Hash } from "lucide-react";
+import { LogOut, Plus, Lock, Hash, Search } from "lucide-react";
 import CreateRoomModal from "../components/CreateRoomModal";
 import type { Room } from "../types";
 
@@ -11,6 +11,13 @@ export default function Dashboard() {
   const { user, logout } = useAuth();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredRooms = rooms.filter(
+    (room) =>
+      room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      room.creatorName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   useEffect(() => {
     const q = query(collection(db, "rooms"), orderBy("createdAt", "desc"));
@@ -45,10 +52,22 @@ export default function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-6 flex items-center justify-end">
+        <div className="mb-8 flex flex-col justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
+          <div className="relative max-w-md flex-1">
+            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              className="block w-full rounded-lg border border-gray-300 bg-white p-2.5 pl-10 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+              placeholder="Search rooms by name or creator..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex cursor-pointer items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700"
+            className="flex cursor-pointer items-center justify-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 sm:w-auto"
           >
             <Plus className="h-4 w-4" />
             <span>Create Room</span>
@@ -58,7 +77,7 @@ export default function Dashboard() {
         <div className="mb-12">
           <h2 className="mb-4 text-lg font-medium text-gray-900">Your Rooms</h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {rooms
+            {filteredRooms
               .filter((room) => room.createdBy === user?.uid)
               .map((room) => (
                 <Link
@@ -86,18 +105,26 @@ export default function Dashboard() {
                   <p className="text-sm text-gray-500">Created by You</p>
                 </Link>
               ))}
-            {rooms.filter((room) => room.createdBy === user?.uid).length ===
-              0 && (
+            {filteredRooms.filter((room) => room.createdBy === user?.uid)
+              .length === 0 && (
               <div className="col-span-full rounded-xl border-2 border-dashed border-gray-200 py-12 text-center">
-                <p className="text-gray-500">
-                  You haven't created any rooms yet.
-                </p>
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
-                >
-                  Create one now
-                </button>
+                {searchQuery ? (
+                  <p className="text-gray-500">
+                    No rooms found matching "{searchQuery}"
+                  </p>
+                ) : (
+                  <>
+                    <p className="text-gray-500">
+                      You haven't created any rooms yet.
+                    </p>
+                    <button
+                      onClick={() => setIsModalOpen(true)}
+                      className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
+                    >
+                      Create one now
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -108,7 +135,7 @@ export default function Dashboard() {
             Available Rooms
           </h2>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {rooms
+            {filteredRooms
               .filter((room) => room.createdBy !== user?.uid)
               .map((room) => (
                 <Link
@@ -138,11 +165,13 @@ export default function Dashboard() {
                   </p>
                 </Link>
               ))}
-            {rooms.filter((room) => room.createdBy !== user?.uid).length ===
-              0 && (
+            {filteredRooms.filter((room) => room.createdBy !== user?.uid)
+              .length === 0 && (
               <div className="col-span-full py-12 text-center">
                 <p className="text-gray-500">
-                  No other rooms available at the moment.
+                  {searchQuery
+                    ? `No available rooms match "${searchQuery}"`
+                    : "No other rooms available at the moment."}
                 </p>
               </div>
             )}
