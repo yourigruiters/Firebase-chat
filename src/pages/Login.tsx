@@ -24,7 +24,7 @@ export default function Login() {
             Welcome Back
           </h1>
           <p className="text-center text-gray-500">
-            Sign in to access your chat rooms and conversations.
+            Sign in to start chatting.
           </p>
         </div>
 
@@ -37,7 +37,7 @@ export default function Login() {
         </button>
 
         <p className="mt-8 text-center text-xs text-gray-400">
-          By signing in, you agree to our Terms of Service and Privacy Policy.
+          By signing in, you agree to absolutely nothing.
         </p>
       </div>
     </div>

@@ -182,7 +182,7 @@ export default function ChatRoom() {
             >
               <ArrowLeft className="h-5 w-5 text-gray-600" />
             </button>
-            <div className="flex items-baseline space-x-2">
+            <div className="flex flex-col sm:flex-row sm:items-baseline sm:space-x-2">
               <h1 className="text-xl font-bold text-gray-900">{room.name}</h1>
               {room.creatorName && (
                 <span className="text-sm font-medium text-gray-500">

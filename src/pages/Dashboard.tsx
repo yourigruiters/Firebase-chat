@@ -30,7 +30,7 @@ export default function Dashboard() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <h1 className="text-2xl font-bold text-gray-900">Chat Dashboard</h1>
           <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-600">
+            <span className="hidden text-sm text-gray-600 sm:block">
               Welcome, {user?.displayName}
             </span>
             <button
