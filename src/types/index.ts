@@ -1,0 +1,16 @@
+export interface Room {
+  id: string;
+  name: string;
+  type: "public" | "private";
+  password?: string;
+  createdAt: number;
+  createdBy: string;
+}
+
+export interface Message {
+  id: string;
+  text: string;
+  senderId: string;
+  senderName: string;
+  createdAt: number; // Store as timestamp
+}
