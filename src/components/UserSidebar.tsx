@@ -24,7 +24,7 @@ export default function UserSidebar({
 
   return (
     <div
-      className={`relative border-l border-r border-gray-200 bg-white transition-all duration-300 ease-in-out ${
+      className={`absolute right-0 top-0 z-20 h-full border-l border-gray-200 bg-white shadow-xl transition-all duration-300 ease-in-out sm:relative sm:z-auto sm:shadow-none ${
         isOpen ? "w-64 lg:w-72" : "w-0"
       }`}
     >

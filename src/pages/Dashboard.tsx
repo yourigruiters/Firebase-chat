@@ -172,10 +172,8 @@ export default function Dashboard() {
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      {room.type === "private" ? (
+                      {room.type === "private" && (
                         <Lock className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
-                      ) : (
-                        <Hash className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
                       )}
                       <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
                         {room.name}

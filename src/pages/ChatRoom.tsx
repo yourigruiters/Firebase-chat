@@ -195,7 +195,7 @@ export default function ChatRoom() {
       </header>
 
       <main className="flex flex-1 overflow-hidden">
-        <div className="mx-auto flex w-full max-w-7xl flex-1 overflow-hidden">
+        <div className="relative mx-auto flex w-full max-w-7xl flex-1 overflow-hidden">
           <div className="flex flex-1 flex-col border-l border-gray-200 bg-slate-100">
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((msg) => {
