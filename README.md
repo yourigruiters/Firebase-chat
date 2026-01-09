@@ -5,10 +5,12 @@ A modern, real-time chat application built with React, TypeScript, and Firebase.
 ## Features
 
 - **Authentication**: Secure sign-in with Google via Firebase Auth.
-- **Real-time Messaging**: Instant message delivery using Cloud Firestore.
-- **Room Management**: Create public or private rooms.
-- **Private Rooms**: Secure rooms with password protection.
-- **Modern UI**: Clean, responsive interface built with Tailwind CSS v4 and a Blue/White theme.
+- **Real-time Messaging**: Instant message delivery using Cloud Firestore, including a participants participant list.
+- **Room Management**: Create public or private (password-protected) rooms.
+- **Search & Discovery**: Filter rooms by name or creator in real-time.
+- **Room Deletion**: Users can delete their own rooms.
+- **Admin Privileges**: Admins can manage/delete any room.
+- **Modern UI**: Polished, responsive design with a premium feel, optimized for both mobile and desktop.
 
 ## Technologies Used
 
@@ -60,6 +62,16 @@ A modern, real-time chat application built with React, TypeScript, and Firebase.
    ```bash
    npm run dev
    ```
+
+## Admin Setup
+
+To grant admin privileges (ability to delete any room):
+
+1. Go to your Firebase Console -> Firestore Database.
+2. Navigate to the `users` collection (it will be created automatically upon user login).
+3. Find the document with the User UID you want to make admin.
+4. Add a boolean field: `isAdmin: true`.
+5. Refresh the application.
 
 ## License
 
