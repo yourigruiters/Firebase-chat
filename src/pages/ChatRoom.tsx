@@ -50,8 +50,6 @@ export default function ChatRoom() {
     fetchRoom();
   }, [roomId, navigate]);
 
-  // Removed automatic participant addition logic to strictly follow "only if they have actually send a message" rule.
-
   useEffect(() => {
     if (!roomId || !isAuthorized) return;
 

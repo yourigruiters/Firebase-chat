@@ -14,5 +14,5 @@ export interface Message {
   text: string;
   senderId: string;
   senderName: string;
-  createdAt: number; // Store as timestamp
+  createdAt: number;
 }

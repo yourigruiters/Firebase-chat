@@ -10,7 +10,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { Link } from "react-router-dom";
-import { LogOut, Plus, Lock, Hash, Search, Trash2 } from "lucide-react";
+import { LogOut, Plus, Lock, Search, Trash2 } from "lucide-react";
 import CreateRoomModal from "../components/CreateRoomModal";
 import type { Room } from "../types";
 
