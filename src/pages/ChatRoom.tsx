@@ -178,18 +178,25 @@ export default function ChatRoom() {
           <div className="flex items-center space-x-4">
             <button
               onClick={() => navigate("/")}
-              className="rounded-full p-2 hover:bg-gray-100"
+              className="cursor-pointer rounded-full p-2 hover:bg-gray-100"
             >
               <ArrowLeft className="h-5 w-5 text-gray-600" />
             </button>
-            <h1 className="text-xl font-bold text-gray-900">{room.name}</h1>
+            <div className="flex items-baseline space-x-2">
+              <h1 className="text-xl font-bold text-gray-900">{room.name}</h1>
+              {room.creatorName && (
+                <span className="text-sm font-medium text-gray-500">
+                  by {room.creatorName}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </header>
 
       <main className="flex flex-1 overflow-hidden">
         <div className="mx-auto flex w-full max-w-7xl flex-1 overflow-hidden">
-          <div className="flex flex-1 flex-col">
+          <div className="flex flex-1 flex-col border-l border-gray-200 bg-slate-100">
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {messages.map((msg) => {
                 const isMe = msg.senderId === user?.uid;
@@ -230,7 +237,7 @@ export default function ChatRoom() {
                 <button
                   type="submit"
                   disabled={!newMessage.trim()}
-                  className="flex items-center justify-center rounded-full bg-blue-600 p-3 text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                  className="flex cursor-pointer items-center justify-center rounded-full bg-blue-600 p-3 text-white transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="h-5 w-5" />
                 </button>

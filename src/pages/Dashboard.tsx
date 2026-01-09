@@ -81,7 +81,8 @@ export default function Dashboard() {
                 )}
               </div>
               <p className="text-sm text-gray-500">
-                Created by {room.createdBy === user?.uid ? "You" : "User"}
+                Created by{" "}
+                {room.createdBy === user?.uid ? "You" : room.creatorName}
               </p>
             </Link>
           ))}

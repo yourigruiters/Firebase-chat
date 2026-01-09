@@ -5,6 +5,7 @@ export interface Room {
   password?: string;
   createdAt: number;
   createdBy: string;
+  creatorName: string;
   participants?: { uid: string; displayName: string }[];
 }
 

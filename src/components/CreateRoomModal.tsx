@@ -31,6 +31,7 @@ export default function CreateRoomModal({
         password: type === "private" ? password : null,
         createdAt: Date.now(),
         createdBy: user.uid,
+        creatorName: user.displayName || "Anonymous",
       });
       onClose();
       setName("");
