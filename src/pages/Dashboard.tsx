@@ -15,7 +15,7 @@ import CreateRoomModal from "../components/CreateRoomModal";
 import type { Room } from "../types";
 
 export default function Dashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin } = useAuth();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -72,8 +72,8 @@ export default function Dashboard() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-8 flex flex-col justify-between space-y-4 sm:flex-row sm:items-center sm:space-y-0">
-          <div className="relative max-w-md flex-1">
+        <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-center sm:gap-0">
+          <div className="relative max-w-full flex-1 order-2 sm:order-1 sm:max-w-md">
             <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
               <Search className="h-5 w-5 text-gray-400" />
             </div>
@@ -87,7 +87,7 @@ export default function Dashboard() {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex cursor-pointer items-center justify-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow hover:bg-blue-700 sm:w-auto"
+            className="flex cursor-pointer items-center justify-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow order-1 hover:bg-blue-700 sm:w-auto sm:order-2"
           >
             <Plus className="h-4 w-4" />
             <span>Create Room</span>
@@ -172,18 +172,31 @@ export default function Dashboard() {
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      {room.type === "private" && (
+                      {room.type === "private" ? (
                         <Lock className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
+                      ) : (
+                        <Hash className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
                       )}
                       <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
                         {room.name}
                       </h3>
                     </div>
-                    {room.type === "private" && (
-                      <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                        Private
-                      </span>
-                    )}
+                    <div className="flex items-center space-x-2">
+                      {room.type === "private" && (
+                        <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                          Private
+                        </span>
+                      )}
+                      {isAdmin && (
+                        <button
+                          onClick={(e) => handleDeleteRoom(e, room.id)}
+                          className="cursor-pointer rounded-full p-2 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                          title="Delete Room"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <p className="text-sm text-gray-500">
                     Created by {room.creatorName}
