@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { db } from "../config/firebase";
-import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  query,
+  orderBy,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { Link } from "react-router-dom";
-import { LogOut, Plus, Lock, Hash, Search } from "lucide-react";
+import { LogOut, Plus, Lock, Hash, Search, Trash2 } from "lucide-react";
 import CreateRoomModal from "../components/CreateRoomModal";
 import type { Room } from "../types";
 
@@ -30,6 +37,19 @@ export default function Dashboard() {
     });
     return unsubscribe;
   }, []);
+
+  const handleDeleteRoom = async (e: React.MouseEvent, roomId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (window.confirm("Are you sure you want to delete this room?")) {
+      try {
+        await deleteDoc(doc(db, "rooms", roomId));
+      } catch (error) {
+        console.error("Error deleting room:", error);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -83,24 +103,31 @@ export default function Dashboard() {
                 <Link
                   key={room.id}
                   to={`/room/${room.id}`}
-                  className="group block rounded-xl bg-white p-6 shadow transition hover:shadow-md"
+                  className="group relative block rounded-xl bg-white p-6 shadow transition hover:shadow-md"
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      {room.type === "private" ? (
+                      {room.type === "private" && (
                         <Lock className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
-                      ) : (
-                        <Hash className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
                       )}
                       <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
                         {room.name}
                       </h3>
                     </div>
-                    {room.type === "private" && (
-                      <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
-                        Private
-                      </span>
-                    )}
+                    <div className="flex items-center space-x-2">
+                      {room.type === "private" && (
+                        <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600">
+                          Private
+                        </span>
+                      )}
+                      <button
+                        onClick={(e) => handleDeleteRoom(e, room.id)}
+                        className="cursor-pointer rounded-full p-2 text-gray-400 hover:bg-red-50 hover:text-red-600"
+                        title="Delete Room"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
                   </div>
                   <p className="text-sm text-gray-500">Created by You</p>
                 </Link>
@@ -145,10 +172,8 @@ export default function Dashboard() {
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                      {room.type === "private" ? (
+                      {room.type === "private" && (
                         <Lock className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
-                      ) : (
-                        <Hash className="h-5 w-5 text-gray-400 group-hover:text-blue-500" />
                       )}
                       <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600">
                         {room.name}
