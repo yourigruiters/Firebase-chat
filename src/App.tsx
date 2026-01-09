@@ -1,7 +1,9 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ChatRoom from "./pages/ChatRoom";
+import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
 
 function App() {
@@ -10,9 +12,23 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/room/:roomId" element={<ChatRoom />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/room/:roomId"
+            element={
+              <ProtectedRoute>
+                <ChatRoom />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
