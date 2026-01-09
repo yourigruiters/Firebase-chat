@@ -11,8 +11,11 @@ import {
   query,
   orderBy,
   serverTimestamp,
+  updateDoc,
+  arrayUnion,
 } from "firebase/firestore";
 import { Send, ArrowLeft, Lock } from "lucide-react";
+import UserSidebar from "../components/UserSidebar";
 import type { Room, Message } from "../types";
 
 export default function ChatRoom() {
@@ -47,15 +50,23 @@ export default function ChatRoom() {
     fetchRoom();
   }, [roomId, navigate]);
 
+  // Removed automatic participant addition logic to strictly follow "only if they have actually send a message" rule.
+
   useEffect(() => {
     if (!roomId || !isAuthorized) return;
+
+    const unsubscribe = onSnapshot(doc(db, "rooms", roomId), (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        setRoom({ id: docSnapshot.id, ...docSnapshot.data() } as Room);
+      }
+    });
 
     const q = query(
       collection(db, "rooms", roomId, "messages"),
       orderBy("createdAt", "asc")
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const unsubscribeMessages = onSnapshot(q, (snapshot) => {
       const msgs = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -64,7 +75,10 @@ export default function ChatRoom() {
       scrollToBottom();
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      unsubscribeMessages();
+    };
   }, [roomId, isAuthorized]);
 
   const scrollToBottom = () => {
@@ -90,9 +104,17 @@ export default function ChatRoom() {
         senderId: user.uid,
         senderName: user.displayName || "Anonymous",
         createdAt: serverTimestamp(),
-      }); // serverTimestamp is better for ordering but local state uses number. Types might conflict.
-      // Adjusting type to allow generic or converting.
-      // For simplicity in this demo, trusting firestore timestamp and casting.
+      });
+
+      // Add user to participants list if not already there
+      const roomRef = doc(db, "rooms", roomId);
+      await updateDoc(roomRef, {
+        participants: arrayUnion({
+          uid: user.uid,
+          displayName: user.displayName || "Anonymous",
+        }),
+      });
+
       setNewMessage("");
     } catch (error) {
       console.error("Error sending message:", error);
@@ -151,8 +173,8 @@ export default function ChatRoom() {
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
-      <header className="bg-white px-4 py-4 shadow sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-4xl items-center justify-between">
+      <header className="border-b border-gray-200 bg-white px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center space-x-4">
             <button
               onClick={() => navigate("/")}
@@ -165,52 +187,70 @@ export default function ChatRoom() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden">
-        <div className="mx-auto flex h-full max-w-4xl flex-col">
-          <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((msg) => {
-              const isMe = msg.senderId === user?.uid;
-              return (
-                <div
-                  key={msg.id}
-                  className={`flex ${isMe ? "justify-end" : "justify-start"}`}
-                >
+      <main className="flex flex-1 overflow-hidden">
+        <div className="mx-auto flex w-full max-w-7xl flex-1 overflow-hidden">
+          <div className="flex flex-1 flex-col">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {messages.map((msg) => {
+                const isMe = msg.senderId === user?.uid;
+                return (
                   <div
-                    className={`max-w-[70%] rounded-2xl px-4 py-2 shadow-sm ${
-                      isMe ? "bg-blue-600 text-white" : "bg-white text-gray-900"
-                    }`}
+                    key={msg.id}
+                    className={`flex ${isMe ? "justify-end" : "justify-start"}`}
                   >
-                    {!isMe && (
-                      <p className="mb-1 text-xs font-medium text-gray-500 opacity-75">
-                        {msg.senderName}
-                      </p>
-                    )}
-                    <p>{msg.text}</p>
+                    <div
+                      className={`max-w-[70%] rounded-2xl px-4 py-2 shadow-sm ${
+                        isMe
+                          ? "bg-blue-600 text-white"
+                          : "bg-white text-gray-900"
+                      }`}
+                    >
+                      {!isMe && (
+                        <p className="mb-1 text-xs font-medium text-gray-500 opacity-75">
+                          {msg.senderName}
+                        </p>
+                      )}
+                      <p>{msg.text}</p>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-            <div ref={messagesEndRef} />
-          </div>
+                );
+              })}
+              <div ref={messagesEndRef} />
+            </div>
 
-          <div className="bg-white p-4 shadow-lg">
-            <form onSubmit={handleSendMessage} className="flex space-x-2">
-              <input
-                type="text"
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                className="flex-1 rounded-full border border-gray-300 bg-gray-50 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                placeholder="Type a message..."
-              />
-              <button
-                type="submit"
-                disabled={!newMessage.trim()}
-                className="flex items-center justify-center rounded-full bg-blue-600 p-3 text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
-              >
-                <Send className="h-5 w-5" />
-              </button>
-            </form>
+            <div className="border-t border-gray-200 bg-white p-4">
+              <form onSubmit={handleSendMessage} className="flex space-x-2">
+                <input
+                  type="text"
+                  value={newMessage}
+                  onChange={(e) => setNewMessage(e.target.value)}
+                  className="flex-1 rounded-full border border-gray-300 bg-gray-50 px-4 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="Type a message..."
+                />
+                <button
+                  type="submit"
+                  disabled={!newMessage.trim()}
+                  className="flex items-center justify-center rounded-full bg-blue-600 p-3 text-white transition-colors hover:bg-blue-700 disabled:opacity-50"
+                >
+                  <Send className="h-5 w-5" />
+                </button>
+              </form>
+            </div>
           </div>
+          <UserSidebar
+            participants={Array.from(
+              new Map(
+                [
+                  ...(room.participants || []),
+                  ...messages.map((m) => ({
+                    uid: m.senderId,
+                    displayName: m.senderName,
+                  })),
+                ].map((p) => [p.uid, p])
+              ).values()
+            )}
+            currentUserId={user?.uid}
+          />
         </div>
       </main>
     </div>

@@ -5,6 +5,7 @@ export interface Room {
   password?: string;
   createdAt: number;
   createdBy: string;
+  participants?: { uid: string; displayName: string }[];
 }
 
 export interface Message {
