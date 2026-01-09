@@ -44,15 +44,16 @@ A modern, real-time chat application built with React, TypeScript, and Firebase.
 
 3. **Configure Firebase:**
 
-   - Open `src/config/firebase.ts`.
-   - Replace the placeholder `firebaseConfig` values with your actual Firebase project keys from the Firebase Console.
-     ```typescript
-     const firebaseConfig = {
-       apiKey: "YOUR_API_KEY",
-       authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-       projectId: "YOUR_PROJECT_ID",
-       // ... other keys
-     };
+   - Create a `.env` file in the root directory.
+   - You can copy the example file:
+     ```bash
+     cp .env.example .env
+     ```
+   - Update the variables in `.env` with your actual Firebase project keys:
+     ```env
+     VITE_FIREBASE_API_KEY=your_key
+     VITE_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+     # ... fill in the rest
      ```
 
 4. **Start the development server:**
