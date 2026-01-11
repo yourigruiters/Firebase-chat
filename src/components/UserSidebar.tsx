@@ -30,7 +30,9 @@ export default function UserSidebar({
     >
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="absolute -left-4 top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm hover:bg-gray-50 focus:outline-none"
+        className={`absolute top-1/2 flex h-8 w-8 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border border-gray-200 bg-white shadow-sm hover:bg-gray-50 focus:outline-none ${
+          isOpen ? "-left-4" : "-left-8"
+        }`}
       >
         {isOpen ? (
           <ChevronRight className="h-4 w-4 text-gray-500" />
