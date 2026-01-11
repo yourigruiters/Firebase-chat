@@ -16,14 +16,16 @@ export default function CreateRoomModal({
   const [name, setName] = useState("");
   const [type, setType] = useState<"public" | "private">("public");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !user) return;
+    if (!name.trim() || !user || isSubmitting) return;
 
+    setIsSubmitting(true);
     try {
       await addDoc(collection(db, "rooms"), {
         name: name.trim(),
@@ -40,6 +42,8 @@ export default function CreateRoomModal({
     } catch (error) {
       console.error("Error creating room:", error);
       alert("Failed to create room. Check console/config.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -50,7 +54,8 @@ export default function CreateRoomModal({
           <h2 className="text-xl font-bold text-gray-800">Create New Room</h2>
           <button
             onClick={onClose}
-            className="rounded-full p-1 hover:bg-gray-100"
+            disabled={isSubmitting}
+            className="rounded-full p-1 hover:bg-gray-100 disabled:opacity-50"
           >
             <X className="h-6 w-6 text-gray-500" />
           </button>
@@ -64,9 +69,10 @@ export default function CreateRoomModal({
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 p-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              className="w-full rounded-lg border border-gray-300 p-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
               placeholder="Enter room name"
               required
+              disabled={isSubmitting}
             />
           </div>
           <div>
@@ -80,7 +86,8 @@ export default function CreateRoomModal({
                   value="public"
                   checked={type === "public"}
                   onChange={() => setType("public")}
-                  className="text-blue-600 focus:ring-blue-500"
+                  className="text-blue-600 focus:ring-blue-500 disabled:opacity-50"
+                  disabled={isSubmitting}
                 />
                 <span>Public</span>
               </label>
@@ -90,7 +97,8 @@ export default function CreateRoomModal({
                   value="private"
                   checked={type === "private"}
                   onChange={() => setType("private")}
-                  className="text-blue-600 focus:ring-blue-500"
+                  className="text-blue-600 focus:ring-blue-500 disabled:opacity-50"
+                  disabled={isSubmitting}
                 />
                 <span>Private</span>
               </label>
@@ -105,17 +113,19 @@ export default function CreateRoomModal({
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 p-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-300 p-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:opacity-50"
                 placeholder="Set a password"
                 required
+                disabled={isSubmitting}
               />
             </div>
           )}
           <button
             type="submit"
-            className="w-full rounded-lg bg-blue-600 py-2 font-semibold text-white transition-colors hover:bg-blue-700"
+            disabled={isSubmitting}
+            className="w-full rounded-lg bg-blue-600 py-2 font-semibold text-white transition-colors hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Room
+            {isSubmitting ? "Creating..." : "Create Room"}
           </button>
         </form>
       </div>
