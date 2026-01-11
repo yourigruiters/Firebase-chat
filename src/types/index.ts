@@ -7,6 +7,7 @@ export interface Room {
   createdBy: string;
   creatorName: string;
   participants?: { uid: string; displayName: string }[];
+  isDeleted?: boolean;
 }
 
 export interface Message {

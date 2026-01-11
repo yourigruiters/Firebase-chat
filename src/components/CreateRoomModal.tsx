@@ -34,6 +34,7 @@ export default function CreateRoomModal({
         createdAt: Date.now(),
         createdBy: user.uid,
         creatorName: user.displayName || "Anonymous",
+        isDeleted: false,
       });
       onClose();
       setName("");

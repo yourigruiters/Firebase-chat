@@ -6,7 +6,7 @@ import {
   onSnapshot,
   query,
   orderBy,
-  deleteDoc,
+  updateDoc,
   doc,
 } from "firebase/firestore";
 import { Link } from "react-router-dom";
@@ -33,7 +33,7 @@ export default function Dashboard() {
         id: doc.id,
         ...doc.data(),
       })) as Room[];
-      setRooms(roomsData);
+      setRooms(roomsData.filter((room) => !room.isDeleted));
     });
     return unsubscribe;
   }, []);
@@ -44,7 +44,9 @@ export default function Dashboard() {
 
     if (window.confirm("Are you sure you want to delete this room?")) {
       try {
-        await deleteDoc(doc(db, "rooms", roomId));
+        await updateDoc(doc(db, "rooms", roomId), {
+          isDeleted: true,
+        });
       } catch (error) {
         console.error("Error deleting room:", error);
       }
