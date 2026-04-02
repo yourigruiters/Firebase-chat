@@ -7,12 +7,8 @@ import {
   doc,
   getDoc,
   onSnapshot,
-  addDoc,
   query,
   orderBy,
-  serverTimestamp,
-  updateDoc,
-  arrayUnion,
 } from "firebase/firestore";
 import { Send, ArrowLeft, Lock } from "lucide-react";
 import UserSidebar from "../components/UserSidebar";
@@ -24,6 +20,7 @@ export default function ChatRoom() {
   const navigate = useNavigate();
   const [room, setRoom] = useState<Room | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [fakeMessages, setFakeMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [password, setPassword] = useState("");
@@ -96,27 +93,34 @@ export default function ChatRoom() {
     e.preventDefault();
     if (!newMessage.trim() || !user || !roomId) return;
 
-    try {
-      await addDoc(collection(db, "rooms", roomId, "messages"), {
-        text: newMessage.trim(),
-        senderId: user.uid,
-        senderName: user.displayName || "Anonymous",
-        createdAt: serverTimestamp(),
-      });
+    const userMsgText = newMessage.trim();
 
-      // Add user to participants list if not already there
-      const roomRef = doc(db, "rooms", roomId);
-      await updateDoc(roomRef, {
-        participants: arrayUnion({
-          uid: user.uid,
-          displayName: user.displayName || "Anonymous",
-        }),
-      });
+    const fakeUserMessage: Message = {
+      id: `fake-user-${Date.now()}`,
+      text: userMsgText,
+      senderId: user.uid,
+      senderName: user.displayName || "Anonymous",
+      createdAt: new Date() as any,
+    };
 
-      setNewMessage("");
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
+    const fakeSystemMessage: Message = {
+      id: `fake-system-${Date.now()}`,
+      text: "Sending messages is disabled in this portfolio test environment. Your message was not saved to the database.",
+      senderId: "system",
+      senderName: "System Admin",
+      createdAt: new Date() as any,
+    };
+
+    setFakeMessages((prev) => [...prev, fakeUserMessage]);
+    setNewMessage("");
+    
+    // Add a slight delay for the system response so it feels more natural
+    setTimeout(() => {
+      setFakeMessages((prev) => [...prev, fakeSystemMessage]);
+      scrollToBottom();
+    }, 600);
+    
+    setTimeout(scrollToBottom, 100);
   };
 
   if (loading)
@@ -196,7 +200,7 @@ export default function ChatRoom() {
         <div className="relative mx-auto flex w-full max-w-7xl flex-1 overflow-hidden">
           <div className="flex flex-1 flex-col border-l border-gray-200 bg-slate-100">
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {messages.map((msg) => {
+              {[...messages, ...fakeMessages].map((msg) => {
                 const isMe = msg.senderId === user?.uid;
                 return (
                   <div
@@ -247,7 +251,7 @@ export default function ChatRoom() {
               new Map(
                 [
                   ...(room.participants || []),
-                  ...messages.map((m) => ({
+                  ...[...messages, ...fakeMessages].map((m) => ({
                     uid: m.senderId,
                     displayName: m.senderName,
                   })),
