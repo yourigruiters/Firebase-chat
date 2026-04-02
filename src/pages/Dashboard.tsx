@@ -23,7 +23,7 @@ export default function Dashboard() {
   const filteredRooms = rooms.filter(
     (room) =>
       room.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      room.creatorName.toLowerCase().includes(searchQuery.toLowerCase())
+      room.creatorName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   useEffect(() => {
@@ -89,7 +89,8 @@ export default function Dashboard() {
           </div>
           <button
             onClick={() => setIsModalOpen(true)}
-            className="flex cursor-pointer items-center justify-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow order-1 hover:bg-blue-700 sm:w-auto sm:order-2"
+            disabled
+            className="flex items-center justify-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow order-1 hover:bg-blue-700 sm:w-auto sm:order-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-blue-600 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             <span>Create Room</span>
@@ -146,9 +147,14 @@ export default function Dashboard() {
                     <p className="text-gray-500">
                       You haven't created any rooms yet.
                     </p>
+                    <p className="mt-1 text-sm text-amber-600/80">
+                      (Room creation is disabled in portfolio mode to prevent
+                      untracked database spam)
+                    </p>
                     <button
                       onClick={() => setIsModalOpen(true)}
-                      className="mt-2 text-sm font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
+                      disabled
+                      className="mt-3 text-sm font-medium text-blue-600 hover:text-blue-500 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-blue-600"
                     >
                       Create one now
                     </button>
