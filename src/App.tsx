@@ -5,11 +5,13 @@ import ChatRoom from "./pages/ChatRoom";
 import NotFound from "./pages/NotFound";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./contexts/AuthContext";
+import TrackingWarningPopup from "./components/TrackingWarningPopup";
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <TrackingWarningPopup />
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route
